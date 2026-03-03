@@ -1,1 +1,38 @@
-Embedded C Code (ATmega328P)
+### Embedded C Code (ATmega328P)
+
+#define F_CPU 16000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+
+void ADC_init() {
+    ADMUX = (1 << REFS0);  // AVcc reference
+    ADCSRA = (1 << ADEN) | (1 << ADPS1) | (1 << ADPS0); 
+}
+
+unsigned int ADC_read() {
+    ADCSRA |= (1 << ADSC);         
+    while (ADCSRA & (1 << ADSC));  
+    return ADC;
+}
+
+int main() {
+    DDRB = 0x07;   // PB0, PB1, PB2 as output (LEDs)
+    ADC_init();
+
+    while (1) {
+        unsigned int adc_value = ADC_read();
+        float temperature = (adc_value * 5.0 * 100.0) / 1024.0;
+
+        if (temperature < 25) {
+            PORTB = 0x01;   // Green ON
+        }
+        else if (temperature >= 25 && temperature < 35) {
+            PORTB = 0x02;   // Yellow ON
+        }
+        else {
+            PORTB = 0x04;   // Red ON
+        }
+
+        _delay_ms(500);
+    }
+}
