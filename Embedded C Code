@@ -33,5 +33,6 @@ int main() {
             PORTB = 0x04;   // Red ON
         }
 
+        _delay_ms(500);
     }
 }
